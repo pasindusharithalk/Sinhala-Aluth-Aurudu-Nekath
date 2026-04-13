@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Sinhala Aluth Avurudu 2026</title>
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#b30000" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Avurudu 2026">
+    <link rel="apple-touch-icon" href="https://picsum.photos/seed/avurudu/192/192" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="toast-container"></div>
+    <div id="petal-container"></div>
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <h2>Settings</h2>
+        <button id="close-sidebar-btn" class="icon-btn" aria-label="Close Settings">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="sidebar-content">
+        <section class="settings-section">
+          <h3>System Test</h3>
+          <button id="test-notification-btn" class="action-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            Send Test Notification
+          </button>
+        </section>
+        <section class="settings-section">
+          <h3>Reminder Intervals</h3>
+          <div class="settings-group" id="interval-settings">
+            <label class="setting-item"><input type="checkbox" value="15" class="interval-cb"> 15 Minutes Before</label>
+            <label class="setting-item"><input type="checkbox" value="10" class="interval-cb"> 10 Minutes Before</label>
+            <label class="setting-item"><input type="checkbox" value="5" class="interval-cb"> 5 Minutes Before</label>
+            <label class="setting-item"><input type="checkbox" value="0" class="interval-cb"> At the Exact Time</label>
+          </div>
+        </section>
+        <section class="settings-section">
+          <h3>Enable Alerts For:</h3>
+          <div class="settings-group" id="nekath-settings">
+            <!-- Dynamically populated -->
+          </div>
+        </section>
+      </div>
+    </aside>
+
+    <div id="app" class="app-container">
+      <header>
+        <div class="header-top">
+          <div class="sun-container">
+            <div id="stylized-sun" class="stylized-sun"></div>
+          </div>
+          <button id="menu-btn" class="icon-btn" aria-label="Open Settings">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+        </div>
+        <h1 id="main-title">අලුත් අවුරුදු නැකත් 2026</h1>
+        <p class="subtitle">Sinhala Aluth Avurudu 2026</p>
+      </header>
+
+      <main>
+        <div class="timer-card">
+          <span class="timer-label" id="timer-status">Next Auspicious Time</span>
+          <div id="next-nekatha-names">
+            <h2 id="next-si" style="font-family: var(--font-display); color: var(--color-gold); margin-bottom: 0.25rem;">--</h2>
+            <p id="next-en" style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 1.5rem;">--</p>
+          </div>
+          <div class="countdown" id="countdown-display">
+            <div class="time-unit">
+              <span class="time-value" id="hours">00</span>
+              <span class="time-label">Hours</span>
+            </div>
+            <div class="time-unit">
+              <span class="time-value" id="minutes">00</span>
+              <span class="time-label">Mins</span>
+            </div>
+            <div class="time-unit">
+              <span class="time-value" id="seconds">00</span>
+              <span class="time-label">Secs</span>
+            </div>
+          </div>
+        </div>
+
+        <section class="nekath-section">
+          <h2 class="section-title">Auspicious Times (Nekath)</h2>
+          <div class="nekath-list" id="nekath-list-container">
+            <!-- Dynamic Content -->
+          </div>
+        </section>
+      </main>
+
+      <div id="pwa-actions" style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: auto;">
+        <button id="notify-btn" class="install-prompt" style="background: var(--color-gold); color: var(--color-bg); display: none;">
+          Enable Notifications
+        </button>
+        <p id="notify-warning" style="display: none; color: #ff4444; font-size: 0.75rem; text-align: center; margin-top: -0.5rem; padding: 0 1rem;">
+          Notifications are blocked in your device settings. Please enable them to receive Nekath reminders.
+        </p>
+        <button id="install-btn" class="install-prompt">
+          Add to Home Screen
+        </button>
+      </div>
+    </div>
+
+    <!-- Nekath Alert Modal -->
+    <div id="nekath-modal" class="modal-overlay">
+      <div class="modal-content">
+        <button id="close-modal-btn" class="icon-btn close-modal" aria-label="Close">&times;</button>
+        <div class="sun-container" style="margin-bottom: 1rem;">
+          <div class="stylized-sun"></div>
+        </div>
+        <h2 id="modal-title-si" class="modal-title-si"></h2>
+        <h3 id="modal-title-en" class="modal-title-en"></h3>
+        <p id="modal-desc" class="modal-desc"></p>
+      </div>
+    </div>
+
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>
+

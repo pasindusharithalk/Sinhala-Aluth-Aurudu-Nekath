@@ -1,4 +1,4 @@
-const CACHE_NAME = 'avurudu-2026-v1';
+const CACHE_NAME = 'avurudu-2026-v2';
 const ASSETS = [
   '/',
   '/index.html',
@@ -57,4 +57,47 @@ self.addEventListener('notificationclick', (event) => {
       }
     })
   );
+});
+
+// Handle messages from the main thread
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.action === 'schedule-test') {
+    const titleImmediate = "🔔 Immediate Background Test";
+    const bodyImmediate = "This is your immediate test. The 5-minute test is scheduled. You can close the app now!";
+    
+    const titleDelayed = "⏳ 5-Minute Test Successful!";
+    const bodyDelayed = "This notification was scheduled 5 minutes ago! The background system works.";
+
+    const icon = '/icon-192.png';
+
+    // Show immediate notification
+    self.registration.showNotification(titleImmediate, {
+      body: bodyImmediate,
+      icon: icon,
+      vibrate: [200, 100, 200],
+      tag: 'test-immediate'
+    });
+
+    // Schedule 5-minute notification
+    // Check if Notification Triggers API is supported
+    if ('showTrigger' in Notification.prototype) {
+      self.registration.showNotification(titleDelayed, {
+        body: bodyDelayed,
+        icon: icon,
+        vibrate: [200, 100, 200],
+        tag: 'test-delayed',
+        showTrigger: new TimestampTrigger(Date.now() + 5 * 60 * 1000)
+      });
+    } else {
+      // Fallback: use setTimeout (might be killed by aggressive OS battery management, but best effort)
+      setTimeout(() => {
+        self.registration.showNotification(titleDelayed, {
+          body: bodyDelayed + " (Fallback mode)",
+          icon: icon,
+          vibrate: [200, 100, 200],
+          tag: 'test-delayed'
+        });
+      }, 5 * 60 * 1000);
+    }
+  }
 });

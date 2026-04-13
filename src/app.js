@@ -105,7 +105,7 @@ const installBtn = document.getElementById('install-btn');
 const toastContainer = document.getElementById('toast-container');
 const countdownDisplay = document.getElementById('countdown-display');
 const nextNekathaNames = document.getElementById('next-nekatha-names');
-const petalContainer = document.getElementById('petal-container');
+const sweetsContainer = document.getElementById('sweets-container');
 
 // Sidebar Elements
 const sidebar = document.getElementById('sidebar');
@@ -115,6 +115,7 @@ const closeSidebarBtn = document.getElementById('close-sidebar-btn');
 const intervalSettings = document.getElementById('interval-settings');
 const nekathSettings = document.getElementById('nekath-settings');
 const testNotificationBtn = document.getElementById('test-notification-btn');
+const testBgNotificationBtn = document.getElementById('test-bg-notification-btn');
 
 let swRegistration = null;
 let isCelebrated = false;
@@ -214,37 +215,64 @@ function initSettingsUI() {
       }
     });
   }
+
+  if (testBgNotificationBtn) {
+    testBgNotificationBtn.addEventListener('click', async () => {
+      if (!('Notification' in window)) {
+        showToast("Your browser does not support notifications.", "error");
+        return;
+      }
+
+      if (Notification.permission !== 'granted') {
+        const perm = await Notification.requestPermission();
+        if (perm !== 'granted') {
+          showToast("Please enable notifications to test.", "error");
+          return;
+        }
+      }
+
+      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({ action: 'schedule-test' });
+        showToast("Background test initiated! Close the app now.", "success");
+      } else {
+        showToast("Service Worker not active. Please reload the page.", "error");
+      }
+    });
+  }
 }
 
 /**
- * Initializes the falling petals animation
+ * Initializes the falling sweets animation
  */
-function initPetals() {
-  const numPetals = 20;
-  for (let i = 0; i < numPetals; i++) {
-    const petal = document.createElement('div');
-    petal.className = 'petal';
+function initSweets() {
+  const numSweets = 12; // Reduced amount so it's not too much
+  const sweetTypes = ['sweet-kokis', 'sweet-kavum', 'sweet-kiribath', 'sweet-mungkavum'];
+  
+  for (let i = 0; i < numSweets; i++) {
+    const sweet = document.createElement('div');
+    const randomType = sweetTypes[Math.floor(Math.random() * sweetTypes.length)];
+    sweet.className = `sweet ${randomType}`;
     
     // Randomize properties
     const left = Math.random() * 100;
     const delay = Math.random() * 10;
-    const duration = Math.random() * 5 + 5; // 5s to 10s
-    const scale = Math.random() * 0.5 + 0.5;
+    const duration = Math.random() * 8 + 7; // 7s to 15s
+    const scale = Math.random() * 0.4 + 0.4; // Smaller size limit
     const rotation = Math.random() * 360;
-    const opacity = Math.random() * 0.5 + 0.3;
+    const opacity = Math.random() * 0.4 + 0.6;
 
-    petal.style.left = `${left}vw`;
-    petal.style.width = `${10 * scale}px`;
-    petal.style.height = `${15 * scale}px`;
-    petal.style.animationDelay = `${delay}s`;
-    petal.style.animationDuration = `${duration}s`;
+    sweet.style.left = `${left}vw`;
+    sweet.style.width = `${24 * scale}px`;
+    sweet.style.height = `${24 * scale}px`;
+    sweet.style.animationDelay = `${delay}s`;
+    sweet.style.animationDuration = `${duration}s`;
     
     // Use CSS variables for keyframes
-    petal.style.setProperty('--scale', scale);
-    petal.style.setProperty('--rotation', `${rotation}deg`);
-    petal.style.setProperty('--opacity', opacity);
+    sweet.style.setProperty('--scale', scale);
+    sweet.style.setProperty('--rotation', `${rotation}deg`);
+    sweet.style.setProperty('--opacity', opacity);
 
-    petalContainer.appendChild(petal);
+    sweetsContainer.appendChild(sweet);
   }
 }
 
@@ -572,43 +600,73 @@ function showNekathModal(event) {
 }
 
 /**
- * Renders the full list of Nekath into the DOM
+ * Renders or updates the full list of Nekath into the DOM
  */
 function renderNekathList() {
   const now = new Date();
-  listContainer.innerHTML = '';
-
+  
   // Find the next upcoming event to apply pulse
   const nextEvent = NEKATH_DATA.find(event => new Date(event.time) > now);
 
+  // If container is empty, build the DOM
+  if (listContainer.children.length === 0) {
+    NEKATH_DATA.forEach(event => {
+      const item = document.createElement('div');
+      item.id = `nekath-item-${event.id}`;
+      
+      const eventTime = new Date(event.time);
+      const formattedTime = eventTime.toLocaleString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'Asia/Colombo'
+      });
+
+      item.innerHTML = `
+        <div class="nekath-info">
+          <span class="nekath-name">${event.titleSi}</span>
+          <span class="nekath-time">${event.titleEn} • ${formattedTime}</span>
+        </div>
+        <span class="status-badge" id="nekath-badge-${event.id}"></span>
+      `;
+      listContainer.appendChild(item);
+    });
+  }
+
+  // Update DOM state for each item
   NEKATH_DATA.forEach(event => {
     const eventTime = new Date(event.time);
     const isPassed = eventTime < now;
     const isNext = nextEvent && event.id === nextEvent.id;
     
-    const item = document.createElement('div');
+    const item = document.getElementById(`nekath-item-${event.id}`);
+    const badge = document.getElementById(`nekath-badge-${event.id}`);
+    
+    if (!item || !badge) return;
+
     item.className = `nekath-item ${isPassed ? 'passed' : ''} ${isNext ? 'next-up' : ''}`;
+    badge.className = `status-badge ${isPassed ? '' : (isNext ? 'status-active' : 'status-upcoming')}`;
 
-    const formattedTime = eventTime.toLocaleString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-      timeZone: 'Asia/Colombo'
-    });
-
-    item.innerHTML = `
-      <div class="nekath-info">
-        <span class="nekath-name">${event.titleSi}</span>
-        <span class="nekath-time">${event.titleEn} • ${formattedTime}</span>
-      </div>
-      <span class="status-badge ${isPassed ? '' : (isNext ? 'status-active' : 'status-upcoming')}">
-        ${isPassed ? 'Passed' : (isNext ? 'Active Soon' : 'Upcoming')}
-      </span>
-    `;
-
-    listContainer.appendChild(item);
+    if (isPassed) {
+      badge.textContent = 'Passed';
+    } else {
+      const diff = eventTime - now;
+      const totalSeconds = Math.max(0, Math.floor(diff / 1000));
+      const d = Math.floor(totalSeconds / (3600 * 24));
+      const h = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const s = totalSeconds % 60;
+      
+      if (d > 0) {
+        badge.textContent = `In ${d}d ${h}h`;
+      } else if (h > 0) {
+        badge.textContent = `In ${h}h ${m}m`;
+      } else {
+        badge.textContent = `In ${m}m ${s}s`;
+      }
+    }
   });
 }
 
@@ -616,7 +674,7 @@ function renderNekathList() {
 
 // Register SW and Init Features
 initSettingsUI();
-initPetals();
+initSweets();
 registerServiceWorker();
 initNotifications();
 initIOSPrompt();
@@ -625,11 +683,7 @@ initVisibilityResync();
 // Update countdown every second
 setInterval(() => {
   updateCountdown();
-  
-  // Refresh list every minute to update 'passed' status
-  if (new Date().getSeconds() === 0) {
-    renderNekathList();
-  }
+  renderNekathList(); // Refresh list every second to update remaining times
 }, 1000);
 
 // Initial calls

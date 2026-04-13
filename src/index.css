@@ -30,7 +30,7 @@ body.punya-kalaya-active {
   background-color: #2a0808; /* Deep spiritual maroon */
 }
 
-body.punya-kalaya-active .petal {
+body.punya-kalaya-active .sweet {
   animation-duration: 15s !important; /* Slower fall */
 }
 
@@ -69,8 +69,8 @@ body.dawn-approaching .stylized-sun {
   100% { transform: scale(1); box-shadow: 0 0 30px rgba(255, 69, 0, 0.8); }
 }
 
-/* Erabadu Petals */
-#petal-container {
+/* Traditional Sweets */
+#sweets-container {
   position: fixed;
   top: 0;
   left: 0;
@@ -81,16 +81,33 @@ body.dawn-approaching .stylized-sun {
   overflow: hidden;
 }
 
-.petal {
+.sweet {
   position: absolute;
   top: -10%;
-  background-color: var(--color-red);
-  border-radius: 15px 0 15px 0;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
   opacity: 0.8;
-  animation: fallPetals linear infinite;
+  animation: fallSweets linear infinite;
 }
 
-@keyframes fallPetals {
+.sweet-kokis {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23F6C344" fill-rule="evenodd" d="M50 5 L62 25 L85 20 L80 42 L100 55 L78 65 L80 88 L58 80 L45 100 L32 80 L10 88 L15 65 L-5 50 L15 38 L10 15 L32 25 Z M50 35 A15 15 0 1 0 50 65 A15 15 0 1 0 50 35 Z"/></svg>');
+}
+
+.sweet-kavum {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%238B4513" d="M45 15 C45 5, 55 5, 55 15 C55 25, 80 40, 80 75 C80 95, 20 95, 20 75 C20 40, 45 25, 45 15 Z"/><ellipse cx="50" cy="15" rx="10" ry="5" fill="%236B3410"/></svg>');
+}
+
+.sweet-kiribath {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon fill="%23F8F8F8" points="50,15 90,50 50,85 10,50"/><polygon fill="%23E0E0E0" points="50,15 90,50 50,50 10,50"/></svg>');
+}
+
+.sweet-mungkavum {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon fill="%23D4A373" points="50,20 85,50 50,80 15,50"/><polygon fill="%23C39362" points="50,20 85,50 50,50 15,50"/></svg>');
+}
+
+@keyframes fallSweets {
   0% {
     transform: translateY(0) rotate(0deg) scale(var(--scale));
     opacity: 0;

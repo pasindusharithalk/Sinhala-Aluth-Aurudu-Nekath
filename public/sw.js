@@ -1,4 +1,4 @@
-const CACHE_NAME = 'avurudu-2026-v2';
+const CACHE_NAME = 'avurudu-2026-v3';
 const ASSETS = [
   '/',
   '/index.html',
@@ -60,8 +60,77 @@ self.addEventListener('notificationclick', (event) => {
 });
 
 // Handle messages from the main thread
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.action === 'schedule-test') {
+self.addEventListener('message', async (event) => {
+  if (event.data && event.data.action === 'schedule-nekath-alerts') {
+    const { nekathData, settings } = event.data;
+    
+    // First, clear any previously scheduled notifications if possible
+    // (Notification Triggers API doesn't have a direct "clear all" yet, 
+    // but we can try to get them and close them if supported)
+    if ('getNotifications' in self.registration) {
+      const notifications = await self.registration.getNotifications();
+      notifications.forEach(n => {
+        if (n.tag && n.tag.startsWith('nekath-')) {
+          n.close();
+        }
+      });
+    }
+
+    const now = Date.now();
+    
+    // Schedule new notifications
+    nekathData.forEach(eventData => {
+      if (!settings.enabledNekaths.includes(eventData.id)) return;
+      
+      const eventTime = new Date(eventData.time).getTime();
+      
+      settings.intervals.forEach(minutesBefore => {
+        const triggerTime = eventTime - (minutesBefore * 60 * 1000);
+        
+        // Only schedule if it's in the future
+        if (triggerTime > now) {
+          let title, body;
+          if (minutesBefore === 0) {
+            title = `${eventData.msgSiTitle} | ${eventData.msgEnTitle}`;
+            body = eventData.msgSiDesc;
+          } else {
+            title = `${eventData.msgSiCountdown} තව විනාඩි ${minutesBefore}යි! ⏳`;
+            body = `${minutesBefore} mins remaining for ${eventData.titleEn}`;
+          }
+
+          const tag = `nekath-${eventData.id}-${minutesBefore}`;
+          const icon = 'https://picsum.photos/seed/avurudu/192/192';
+
+          if ('showTrigger' in Notification.prototype) {
+            self.registration.showNotification(title, {
+              body: body,
+              icon: icon,
+              badge: icon,
+              vibrate: [200, 100, 200],
+              tag: tag,
+              showTrigger: new TimestampTrigger(triggerTime)
+            });
+          } else {
+            // Fallback for browsers without Notification Triggers API
+            // Note: This relies on the SW staying alive, which is not guaranteed.
+            const delay = triggerTime - now;
+            // Only use setTimeout if it's within a reasonable timeframe (e.g., 24 hours)
+            if (delay < 24 * 60 * 60 * 1000) {
+              setTimeout(() => {
+                self.registration.showNotification(title, {
+                  body: body,
+                  icon: icon,
+                  badge: icon,
+                  vibrate: [200, 100, 200],
+                  tag: tag
+                });
+              }, delay);
+            }
+          }
+        }
+      });
+    });
+  } else if (event.data && event.data.action === 'schedule-test') {
     const titleImmediate = "🔔 Immediate Background Test";
     const bodyImmediate = "This is your immediate test. The 5-minute test is scheduled. You can close the app now!";
     

@@ -33,7 +33,7 @@ const NEKATH_DATA = [
     id: 3,
     titleSi: "ආහාර පිසීම",
     titleEn: "Cooking the First Meal",
-    time: "2026-04-14T10:41:00+05:30",
+    time: "2026-04-14T10:51:00+05:30",
     notified: { 15: false, 10: false, 5: false, 0: false },
     modalShown: false,
     msgSiTitle: "ආහාර පිසීමේ නැකත උදාවෙයි!",
